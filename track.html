@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        .shipment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .shipment {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+        .shipment.completed {
+            background-color: #d4edda;
+        }
+        .shipment.pending {
+            background-color: #f8d7da;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            width: 80%;
+        }
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .map-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background-color: #eee;
+        }
+        .map-indicator {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: red;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            font-size: 16px;
+            line-height: 24px;
+        }
+        .location-info {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Shipment Details</h1>
+    <div id="shipmentList" class="shipment-list">
+        <!-- Shipment details will be loaded here -->
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeMap()">&times;</span>
+            <h2>Shipment Tracker Map</h2>
+            <div id="mapContainer" class="map-container">
+                <!-- Single Map Indicator will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample shipment data
+        const shipments = [
+            { trackingNumber: 'ABC123', dispatchDate: '2024-10-20', deliveryDate: '2024-11-05', status: 'Completed', bank: 'Bank A', destinationAddress: '123 Main St, New York, NY' },
+            { trackingNumber: 'DEF456', dispatchDate: '2024-10-21', deliveryDate: '2024-11-06', status: 'Completed', bank: 'Bank B', destinationAddress: '456 Elm St, Boston, MA' },
+            { trackingNumber: 'GHI789', dispatchDate: '2024-10-22', deliveryDate: '2024-11-07', status: 'Completed', bank: 'Bank C', destinationAddress: '789 Pine St, Chicago, IL' },
+            { trackingNumber: 'JKL012', dispatchDate: '2024-10-23', deliveryDate: '2024-11-08', status: 'Completed', bank: 'Bank D', destinationAddress: '321 Oak St, Seattle, WA' },
+            { trackingNumber: 'MNO345', dispatchDate: '2024-10-24', deliveryDate: '2024-11-09', status: 'Completed', bank: 'Bank E', destinationAddress: '654 Cedar St, Austin, TX' },
+            { trackingNumber: 'PQR678', dispatchDate: '2024-10-25', deliveryDate: '2024-11-10', status: 'Completed', bank: 'Bank F', destinationAddress: '987 Spruce St, Miami, FL' },
+            { trackingNumber: 'STU901', dispatchDate: '2024-10-26', deliveryDate: '2024-11-11', status: 'Pending', bank: 'Bank G', destinationAddress: '159 Birch St, Denver, CO' },
+            { trackingNumber: 'VWX234', dispatchDate: '2024-10-27', deliveryDate: '2024-11-12', status: 'Pending', bank: 'Bank H', destinationAddress: '753 Willow St, Atlanta, GA' },
+        ];
+
+        // Function to display all shipments
+        function displayShipments() {
+            const shipmentList = document.getElementById('shipmentList');
+            shipmentList.innerHTML = '';
+
+            shipments.forEach(data => {
+                const shipment = document.createElement('div');
+                shipment.classList.add('shipment');
+                shipment.classList.add(data.status === 'Completed' ? 'completed' : 'pending');
+                shipment.innerHTML = `
+                    <p><strong>Tracking Number:</strong> ${data.trackingNumber}</p>
+                    <p><strong>Dispatch Date:</strong> ${data.dispatchDate}</p>
+                    <p><strong>Delivery Date:</strong> ${data.deliveryDate}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Bank:</strong> ${data.bank}</p>
+                    <p><strong>Destination:</strong> ${data.destinationAddress}</p>
+                `;
+
+                if (data.status === 'Pending') {
+                    const mapButton = document.createElement('button');
+                    mapButton.innerText = 'View on Map';
+                    mapButton.onclick = () => openMap(data);
+                    shipment.appendChild(mapButton);
+                }
+
+                shipmentList.appendChild(shipment);
+            });
+        }
+
+        // Show map modal
+        function openMap(data) {
+            const mapModal = document.getElementById('mapModal');
+            mapModal.style.display = 'block';
+
+            // Display current location on map
+            displayCurrentLocation(data.trackingNumber);
+        }
+
+        // Close map modal
+        function closeMap() {
+            const mapModal = document.getElementById('mapModal');
+            mapModal.style.display = 'none';
+        }
+
+        // Function to display single map indicator showing exact location
+        function displayCurrentLocation(trackingNumber) {
+            const mapContainer = document.getElementById('mapContainer');
+            mapContainer.innerHTML = ''; // Clear previous map
+
+            // Define a sample current location for each shipment (dynamic data can be used here)
+            const currentLocation = {
+                name: "Checkpoint 2",
+                waitTime: "30 minutes",
+                x: '50%',
+                y: '30%'
+            };
+
+            // Create and place the indicator for current location
+            const indicator = document.createElement('div');
+            indicator.className = 'map-indicator';
+            indicator.innerText = '📍';
+            indicator.style.left = currentLocation.x;
+            indicator.style.top = currentLocation.y;
+
+            // Display location name and wait time
+            const locationInfo = document.createElement('div');
+            locationInfo.className = 'location-info';
+            locationInfo.style.left = currentLocation.x;
+            locationInfo.style.top = parseFloat(currentLocation.y) - 10 + '%'; // Position above the indicator
+            locationInfo.innerText = `${currentLocation.name}: ${currentLocation.waitTime}`;
+
+            mapContainer.appendChild(indicator);
+            mapContainer.appendChild(locationInfo);
+
+            // Display the tracking number on the map
+            const label = document.createElement('p');
+            label.innerText = `Tracking: ${trackingNumber}`;
+            label.style.position = 'absolute';
+            label.style.top = '10px';
+            label.style.left = '10px';
+            label.style.fontSize = '18px';
+            label.style.fontWeight = 'bold';
+
+            mapContainer.appendChild(label);
+        }
+
+        // Load shipments when the page loads
+        window.onload = displayShipments;
+    </script>
+</body>
+</html>

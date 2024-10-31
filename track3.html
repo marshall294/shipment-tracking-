@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            padding: 1rem;
+            background-color: #333;
+            color: #fff;
+            margin: 0;
+        }
+        .shipment {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem auto;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .delivered {
+            background-color: #e6f7e6;
+        }
+        .pending {
+            background-color: #f9e6e6;
+        }
+        .shipment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .carrier-logo {
+            height: 30px;
+            width: auto;
+        }
+        .shipment-details {
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+        .shipment-status {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .tracking-btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            margin-top: 0.5rem;
+            color: #fff;
+            background-color: #007bff;
+            text-align: center;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .tracking-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shipment Tracking Status</h1>
+
+    <!-- Delivered Shipment Template -->
+    <section class="shipment delivered">
+        <div class="shipment-header">
+            <div class="shipment-status">Delivered</div>
+            <img src="fedex-logo.png" alt="FedEx" class="carrier-logo">
+        </div>
+        <div class="shipment-details"><strong>Tracking ID:</strong> TRK123456A</div>
+        <div class="shipment-details"><strong>Dispatch Time:</strong> 8:00 AM</div>
+        <div class="shipment-details"><strong>Expected Delivery:</strong> 10:00 AM</div>
+        <div class="shipment-details"><strong>Delivery Time:</strong> 10:00 AM</div>
+        <div class="shipment-details"><strong>Destination:</strong> New York</div>
+        <div class="shipment-details"><strong>Shipping Method:</strong> Overnight</div>
+        <div class="shipment-details"><strong>Comments:</strong> On time</div>
+    </section>
+
+    <!-- Pending Shipment Template with Tracking Button -->
+    <section class="shipment pending">
+        <div class="shipment-header">
+            <div class="shipment-status">Pending</div>
+            <img src="ups-logo.png" alt="UPS" class="carrier-logo">
+        </div>
+        <div class="shipment-details"><strong>Tracking ID:</strong> TRK123467L</div>
+        <div class="shipment-details"><strong>Dispatch Time:</strong> 4:00 PM</div>
+        <div class="shipment-details"><strong>Expected Delivery:</strong> 6:00 PM</div>
+        <div class="shipment-details"><strong>Destination:</strong> Los Angeles</div>
+        <div class="shipment-details"><strong>Shipping Method:</strong> Ground</div>
+        <div class="shipment-details"><strong>Checkpoint Status:</strong> Checkpoint 3 of 5</div>
+        <a href="tracking-map.html?trackingID=TRK123467L" class="tracking-btn">Track Shipment</a>
+    </section>
+
+    <!-- Repeat sections for other shipments as needed, adjusting details -->
+
+    <!-- Sample shipment for DHL with different checkpoint -->
+    <section class="shipment pending">
+        <div class="shipment-header">
+            <div class="shipment-status">Pending</div>
+            <img src="dhl-logo.png" alt="DHL" class="carrier-logo">
+        </div>
+        <div class="shipment-details"><strong>Tracking ID:</strong> TRK123470O</div>
+        <div class="shipment-details"><strong>Dispatch Time:</strong> 5:30 PM</div>
+        <div class="shipment-details"><strong>Expected Delivery:</strong> 7:30 PM</div>
+        <div class="shipment-details"><strong>Destination:</strong> Philadelphia</div>
+        <div class="shipment-details"><strong>Shipping Method:</strong> Standard</div>
+        <div class="shipment-details"><strong>Checkpoint Status:</strong> Checkpoint 1 of 5</div>
+        <a href="tracking-map.html?trackingID=TRK123470O" class="tracking-btn">Track Shipment</a>
+    </section>
+</body>
+</html>
+a
